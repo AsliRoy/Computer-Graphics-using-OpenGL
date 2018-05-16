@@ -1,0 +1,248 @@
+#include <Windows.h>
+#include <GL\glew.h>
+#include <GL\freeglut.h>
+#include <iostream>
+#include <math.h>
+
+#define NUMSTEPS 0.01
+#define tension 0.00
+GLfloat P[4][4][3] = {
+   {{-4.5, -4.5, 12.0}, {-1.5, -4.5, 6.0}, 
+    {1.5, -4.5, -3.0}, {4.5, -4.5, 6.0}}, 
+   {{-4.5, -1.5, 3.0}, {-1.5, -1.5, 9.0}, 
+    {1.5, -1.5, 0.0}, {4.5, -1.5, -3.0}}, 
+   {{-4.5, 1.5, 12.0}, {-1.5, 1.5, 0.0}, 
+    {1.5, 1.5, 9.0}, {4.5, 1.5, 12.0}}, 
+   {{-4.5, 4.5, -6.0}, {-1.5, 4.5, -6.0}, 
+    {1.5, 4.5, 0.0}, {4.5, 4.5, -3.0}}
+};
+ 
+ 
+GLfloat D[] = {1.0f, 1.0f, 0.0f, 0.0f,
+               0.0f, 0.0f, 1.0f, 1.0f,
+               0.0f, 0.33333333333333f, 0.0f, 0.0f,
+			   0.0f, 0.0f, -0.33333333333333f, 0.0f};
+GLfloat DT[] = {1.0f, 0.0f, 0.0f, 0.0f,
+                1.0f, 0.0f, 0.33333333333333f, 0.0f,
+                0.0f, 1.0f, 0.0f, -0.33333333333333f,
+			    0.0f, 1.0f, 0.0f, 0.0f};
+ 
+GLfloat StartPt_u(int ii,int jj){
+ 
+	return P[jj][1][ii]; 
+}
+ 
+GLfloat EndPt_u(int ii,int jj){
+    return P[jj][2][ii]; 
+}
+ 
+GLfloat StartTan_u(int ii,int jj){
+	return(   (1-tension)*(P[jj][2][ii] - P[jj][0][ii])  /2 ); 
+}
+ 
+GLfloat EndTan_u(int ii,int jj){
+	return(   (1-tension)*(P[jj][3][ii] - P[jj][1][ii])/2  ); 
+}
+ 
+GLfloat StartPt_w(int ii,int jj){
+	return P[1][jj][ii]; 
+}
+ 
+GLfloat EndPt_w(int ii,int jj){
+    return P[2][jj][ii]; 
+}
+ 
+GLfloat StartTan_w(int ii,int jj){
+	return(   (1-tension)*(P[2][jj][ii] - P[0][jj][ii])  /2 ); 
+}
+ 
+GLfloat EndTan_w(int ii,int jj){
+	return(   (1-tension)*(P[3][jj][ii] - P[1][jj][ii])/2  ); 
+}
+ 
+ 
+ 
+ 
+void Spline_u(int piece_s,int piece_e){
+	int i,j;
+	double t, vv[3];
+	double inc;
+	inc = NUMSTEPS;
+ 
+       for(j=piece_s-1;j<piece_e;j++){
+    glBegin(GL_LINE_STRIP);
+	for(t=0; t<=1; t+=inc){
+		for(i=0;i<3;i++){
+			vv[i] = ((2*t*t*t)-(3*t*t)+1)*StartPt_u(i,j)
+				+ ((-2*t*t*t)+(3*t*t))*EndPt_u(i,j)
+				+ ((t*t*t)-(2*t*t)+t)*StartTan_u(i,j)
+				+ ((t*t*t)-(t*t))*EndTan_u(i,j);
+		}
+		glColor3d(0.0,0.0,0.0);
+	  glVertex3dv(vv);
+	}
+     glEnd();
+    }
+}
+ 
+void Spline_w(int piece_s,int piece_e){
+	int i,j;
+	double t, vv[3];
+	double inc;
+	inc = NUMSTEPS;
+	       for(j=piece_s-1;j<piece_e;j++){
+    glBegin(GL_LINE_STRIP);
+	for(t=0; t<1; t+=inc){
+		for(i=0;i<3;i++){
+			vv[i] = ((2*t*t*t)-(3*t*t)+1)*StartPt_w(i,j)
+				+ ((-2*t*t*t)+(3*t*t))*EndPt_w(i,j)
+				+ ((t*t*t)-(2*t*t)+t)*StartTan_w(i,j)
+				+ ((t*t*t)-(t*t))*EndTan_w(i,j);
+		}
+ 
+		glColor3d(0.0,0.0,0.0);
+	  glVertex3dv(vv);
+	}
+     glEnd();
+    }
+}
+ 
+void draw_splinegrid()
+{  
+  // Spline_u(2, 3);
+  // Spline_w(2, 3); 
+ 
+}
+GLfloat B[4][4][3];
+void convert(int ii)
+{
+ 
+int i,j;
+GLfloat p00 = StartPt_u(ii,1);
+GLfloat p10 = EndPt_w(ii,1);
+GLfloat p00u = StartTan_w(ii,1);
+GLfloat p10u = StartTan_w(ii,2);
+GLfloat p01 = EndPt_u(ii, 1);
+GLfloat p11 = EndPt_w(ii,2);
+GLfloat p01u = EndTan_w(ii,1);
+GLfloat p11u = EndTan_w(ii,2);
+ 
+GLfloat p00w = StartTan_u(ii,1);
+GLfloat p10w = StartTan_u(ii,2);
+ 
+GLfloat p01w = EndTan_u(ii,1);
+GLfloat p11w = EndTan_u(ii,2);          
+GLfloat C[] = {p00, p10, p00u, p10u,
+               p01, p11, p01u, p11u,
+               p00w, p10w, 0.0f, 0.0f,
+			   p01w, p11w, 0.0f, 0.0f};
+GLfloat m[16];
+ 
+ glMatrixMode(GL_MODELVIEW);
+glLoadMatrixf (D);
+ 
+ 
+glMultMatrixf (C);
+ 
+ 
+glMultMatrixf(DT);
+ 
+glGetFloatv(GL_MODELVIEW_MATRIX,m);
+  for(i=0;i<4;i++){
+	  for(j=0;j<4;j++){
+		  B[i][j][ii]=m[4*i+j];
+ 
+	  }
+ 
+	  }
+ } 
+ 
+void Bvertex()
+{
+	int i;
+	for(i = 0; i < 3; i++){
+		convert(i);
+	}
+glLoadIdentity();
+}
+
+void display(void)
+{
+	int i, j;
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glColor3f(1.0, 1.0, 1.0);
+   //glMatrixMode(GL_MODELVIEW);
+   glPushMatrix ();
+   glRotatef(15.0, 1.0, 1.0, 1.0);
+   glEvalMesh2(GL_FILL, 0, 100, 0, 100);
+
+   glColor3f(0.0, 0.0, 0.0);
+   glLineWidth(2.0);
+   
+ 
+      for (j = 0; j <= 3; j++) {
+      /*glBegin(GL_LINE_STRIP);
+      for (i = 0; i <= 100; i++)
+         glEvalCoord2f((GLfloat)i/100.0, (GLfloat)j/8.0);
+      glEnd();*/
+
+      glBegin(GL_LINE_STRIP);
+      for (i = 0; i <= 100; i++)
+         glEvalCoord2f((GLfloat)j/3.0, (GLfloat)i/100.0);
+      glEnd();
+
+   }
+
+ 
+   //draw_splinegrid();   
+   glPopMatrix ();
+   glFlush();
+ 
+}
+ 
+void init(void)
+{
+	Bvertex();
+   glClearColor (0.0, 0.0, 0.0, 0.0);
+   glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &B[0][0][0]);
+ glEnable(GL_MAP2_VERTEX_3);
+  glMapGrid2f(100, 0.0, 1.0, 100, 0.0, 1.0);
+   glEnable(GL_DEPTH_TEST);
+   glShadeModel(GL_FLAT);
+    glEnable(GL_LINE_SMOOTH);
+	 glEnable(GL_POINT_SMOOTH);
+ 
+}
+ 
+void reshape(GLsizei w, GLsizei h)
+{  if(h==0)
+   h=1;
+   glViewport(0, 0, w, h);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   if (w <= h)
+      glOrtho(-4.0, 4.0, -4.0*(GLfloat)h/(GLfloat)w, 
+        4.0*(GLfloat)h/(GLfloat)w, -20.0, 20.0);
+   else
+      glOrtho(-4.0*(GLfloat)w/(GLfloat)h, 
+              4.0*(GLfloat)w/(GLfloat)h, -4.0, 4.0, -20.0, 20.0);
+   glMatrixMode(GL_MODELVIEW);
+   glLoadIdentity();
+}
+ 
+int main(int argc, char** argv)
+{
+ 
+   glutInit(&argc, argv);
+   glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+   glutInitWindowSize (400, 400); 
+   glutInitWindowPosition (100, 100);
+   glutCreateWindow (argv[0]);
+   init();
+   glutDisplayFunc(display);
+   glutReshapeFunc(reshape);
+   //glutKeyboardFunc(keyboard);
+   glutMainLoop();
+   return 0;
+ 
+}

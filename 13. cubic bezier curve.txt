@@ -1,0 +1,66 @@
+#include <Windows.h>
+#include <GL\glew.h>
+#include <GL\freeglut.h>
+#include <iostream>
+#include<stdio.h>
+int x1, x2, x3, y11, y2, y3, x4, y4;
+
+void myInit() 
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(1.0, 0.0, 0.0, 0.0);
+	glMatrixMode(GL_PROJECTION);
+	gluOrtho2D(0, 500, 0, 500);
+}
+
+void draw_pixel(int x, int y)
+{
+	glBegin(GL_POINTS);
+	glColor3f (1.0, 1.0, 1.0);
+	glVertex2i(x, y);
+	glEnd();
+}
+void draw_gray(int x, int y)
+{
+	glBegin(GL_POINTS);
+	glColor3f (0.5, 0.5, 0.5);
+	glVertex2i(x, y);
+	glEnd();
+}
+void draw_curve()
+{
+	double u,x,y;
+	draw_pixel(x1,y11);
+	draw_pixel(x4,y4);
+	for (u=0.01;u<1;u=u+0.01)
+	{
+		x=(1-u)*(1-u)*(1-u)*x1+3*(1-u)*(1-u)*u*x2+3*u*u*(1-u)*x3+u*u*u*x4;
+		y=(1-u)*(1-u)*(1-u)*y11+3*(1-u)*(1-u)*u*y2+3*u*u*(1-u)*y3+u*u*u*y4;
+		draw_pixel(x,y);
+	}
+
+}
+
+
+void myDisplay() 
+{
+	//draw_line(0,500,250,250);
+	//draw_line(250,250,0,500);
+	draw_curve();
+	glFlush();
+}
+
+void main(int argc, char **argv)
+{
+
+	printf( "Enter (x1, y1, x2, y2, x3, y3, x4, y4)\n");
+	scanf("%d %d %d %d %d %d %d %d", &x1, &y11, &x2, &y2, &x3, &y3, &x4, &y4);
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+	glutInitWindowSize(500, 500);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("Bezier Cubic Curve Drawing");
+	myInit();
+	glutDisplayFunc(myDisplay);
+	glutMainLoop();
+}

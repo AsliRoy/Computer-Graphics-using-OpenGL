@@ -1,0 +1,209 @@
+// C code to implement basic
+// transformations in OPENGL
+#include <stdio.h>
+#include <math.h>
+#include <time.h>
+#include <GL/glut.h>
+
+// window size
+#define maxWD 640
+#define maxHT 480
+
+// rotation speed
+#define thetaSpeed 0.05
+
+int matX[4]={0,10,10,0}, matY[4] = {0,0,10,10};
+int new_matX[4], new_matY[4];
+int theta;
+// this creates delay between two actions
+/*void delay(unsigned int mseconds)
+{
+clock_t goal = mseconds + clock();
+while (goal > clock())
+;
+}*/
+
+// this is a basic init for the glut window
+void myInit(void)
+{
+	glClearColor(1.0, 1.0, 1.0, 0.0);
+	glOrtho(-1000.0, 1000.0, -1000.0, 1000.0, -1.0, 1.0);
+}
+
+void draw_pixel(int x, int y,float r,float g,float b) {
+	glBegin(GL_POINTS);
+	glColor3f(r, g, b);
+	glVertex2i(x, y);
+	glEnd();
+}
+// this function just draws a point
+void drawPoint(int x, int y,float r,float g,float b)
+{
+	glPointSize(4.0);
+	glColor3f(r, g, b);
+	glBegin(GL_LINES);
+	glVertex2i(x, y);
+	glEnd();
+}
+
+
+
+void drawSq()
+{
+	int i,j;
+	for(i=-500;i<=500;i++)
+	{
+		for(j=-500;j<=500;j++)
+		{
+			if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+				draw_pixel(i,j,1,1,0);
+			else
+				draw_pixel(i,j,0,1,0);
+		}
+	}
+}
+
+void rotateSq(){
+	int i, j,x,y;
+	float angle = 0.0;
+	angle = ((float)theta * 3.14159) / 180.0;
+	float radius=70.7;
+	float ang_sec=angle/10;
+	float pos;
+	for(i=-500;i<=500;i++){
+		for(j=-500;j<=500;j++){
+			pos=i*i+j*j;
+			if(pos<=(radius*radius)){
+				x = (i * cos(ang_sec)) - (j * sin(ang_sec));
+				y = (j * cos(ang_sec)) + (i * sin(ang_sec)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}else if(pos>(radius*radius) && pos<=(radius*radius*4)){
+				x = (i * cos(ang_sec*2)) - (j * sin(ang_sec*2));
+				y = (j * cos(ang_sec*2)) + (i * sin(ang_sec*2)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}else if(pos>(radius*radius*4) && pos<=(radius*radius*9)){
+				x = (i * cos(ang_sec*3)) - (j * sin(ang_sec*3));
+				y = (j * cos(ang_sec*3)) + (i * sin(ang_sec*3)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}else if(pos>(radius*radius*9) && pos<=(radius*radius*16)){
+				x = (i * cos(ang_sec*4)) - (j * sin(ang_sec*4));
+				y = (j * cos(ang_sec*4)) + (i * sin(ang_sec*4)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}else if(pos>(radius*radius*16) && pos<=(radius*radius*25)){
+				x = (i * cos(ang_sec*5)) - (j * sin(ang_sec*5));
+				y = (j * cos(ang_sec*5)) + (i * sin(ang_sec*5)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}else if(pos>(radius*radius*25) && pos<=(radius*radius*36)){
+				x = (i * cos(ang_sec*6)) - (j * sin(ang_sec*6));
+				y = (j * cos(ang_sec*6)) + (i * sin(ang_sec*6)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}else if(pos>(radius*radius*36) && pos<=(radius*radius*49)){
+				x = (i * cos(ang_sec*7)) - (j * sin(ang_sec*7));
+				y = (j * cos(ang_sec*7)) + (i * sin(ang_sec*7)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}else if(pos>(radius*radius*49) && pos<=(radius*radius*64)){
+				x = (i * cos(ang_sec*8)) - (j * sin(ang_sec*8));
+				y = (j * cos(ang_sec*8)) + (i * sin(ang_sec*8)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}else if(pos>(radius*radius*64) && pos<=(radius*radius*81)){
+				x = (i * cos(ang_sec*9)) - (j * sin(ang_sec*9));
+				y = (j * cos(ang_sec*9)) + (i * sin(ang_sec*9)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}else if(pos>(radius*radius*81) && pos<=(radius*radius*100)){
+				x = (i * cos(ang_sec*10)) - (j * sin(ang_sec*10));
+				y = (j * cos(ang_sec*10)) + (i * sin(ang_sec*10)); 
+				if((i>=-50 && i<= 50) || (j>=-50 && j<=50))
+					draw_pixel(x,y,1,1,0);
+				else
+					draw_pixel(x,y,0,1,0);
+			}
+		}
+	}
+}
+void drawaxis()
+{
+	for (int i = -100; i <= 100; i++)	//X and Y axis
+	{
+		draw_pixel(i, 0,1,1,1);
+		draw_pixel(0, i,1,1,1);
+
+	}
+	for (int i = -2; i <= 2; i++)
+	{
+		draw_pixel(95 + i, 4 + i,1,1,1);
+		draw_pixel(95 - i, 4 + i,1,1,1);
+
+	}
+	for (int i = 0; i <= 2; i++)
+	{
+		draw_pixel(4 + i, 95 + i,1,1,1);
+		draw_pixel(4 - i, 95 + i,1,1,1);
+		draw_pixel(4, 95 - i,1,1,1);
+
+	}
+}
+
+
+// Actual display function
+void myDisplay(void)
+{
+	int opt, i;
+	int tx, ty;
+	int rotX, rotY;
+	int sx, sy;
+	
+	
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	//drawP(matX, matY,0,0,1);
+	drawaxis();
+	//drawSq();
+	printf("Enter the angle: ");
+	scanf("%d", &theta);
+	rotateSq();
+	glFlush();
+
+	
+
+	
+	
+}
+
+void main(int argc, char** argv)
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitWindowSize(maxWD, maxHT);
+	glutInitWindowPosition(100, 150);
+	glutCreateWindow("Transforming point");
+	glutDisplayFunc(myDisplay);
+	myInit();
+	glutMainLoop();
+}

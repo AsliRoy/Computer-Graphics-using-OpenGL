@@ -1,0 +1,96 @@
+#include <Windows.h>
+#include <GL\glew.h>
+#include <GL\freeglut.h>
+#include <iostream>
+#include<stdio.h>
+int x1, x2, x3, y11, y2, y3, x4, y4;
+
+void myInit() 
+{
+	
+	glClearColor(1.0, 1.0, 1.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glMatrixMode(GL_PROJECTION);
+	gluOrtho2D(0, 500, 0, 500);
+}
+
+void drawP()
+{
+	glColor3f(0,0,0);
+	glBegin(GL_LINES);
+	glVertex2i(x1,y11);
+	glVertex2i(x2,y2);
+	glEnd();
+
+	glBegin(GL_LINES);
+	glVertex2i(x2,y2);
+	glVertex2i(x3,y3);
+	glEnd();
+
+	glBegin(GL_LINES);
+	glVertex2i(x3,y3);
+	glVertex2i(x4,y4);
+	glEnd();
+}
+void draw_pixel(int x, int y)
+{
+	glBegin(GL_POINTS);
+	glColor3f (0.0, 0.0, 0.0);
+	glVertex2i(x, y);
+	glEnd();
+}
+void draw_gray(int x, int y)
+{
+	glBegin(GL_POINTS);
+	glColor3f (0.5, 0.5, 0.5);
+	glVertex2i(x, y);
+	glEnd();
+}
+void draw_curve()
+{
+	drawP();
+	double dt=0.0005;
+	double x,y;
+	double dfx,dfy,ddfx,ddfy,dddfx,dddfy;
+	x=x1;
+	y=y11;
+	dfx=(3*x2-3*x1)*dt+(3*x1-6*x2+3*x3)*dt*dt+(-x1+3*x2-3*x3+x4)*dt*dt*dt;
+	dfy=(3*y2-3*y11)*dt+(3*y11-6*y2+3*y3)*dt*dt+(-y11+3*y2-3*y3+y4)*dt*dt*dt;
+	ddfx=2*(3*x1-6*x2+3*x3)*dt*dt+6*(-x1+3*x2-3*x3+x4)*dt*dt*dt;
+	ddfy=2*(3*y11-6*y2+3*y3)*dt*dt+6*(-y11+3*y2-3*y3+y4)*dt*dt*dt;
+	dddfx=6*(-x1+3*x2-3*x3+x4)*dt*dt*dt;
+	dddfy=6*(-y11+3*y2-3*y3+y4)*dt*dt*dt;
+	for (double dt=0.0005;dt<1;dt=dt+0.0005)
+	{
+		draw_pixel(x,y);
+		x=x+dfx;
+		y=y+dfy;
+		dfx=dfx+ddfx;
+		dfy=dfy+ddfy;
+		ddfx=ddfx+dddfx;
+		ddfy=ddfy+dddfy;
+	}
+
+}
+
+
+void myDisplay() 
+{
+	draw_curve();
+	glFlush();
+}
+
+void main(int argc, char **argv)
+{
+
+	printf( "Enter (x1, y1, x2, y2, x3, y3, x4, y4)\n");
+	scanf("%d %d %d %d %d %d %d %d", &x1, &y11, &x2, &y2, &x3, &y3, &x4, &y4);
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+	glutInitWindowSize(500, 500);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("Bezier Cubic Curve Drawing by using Taylor series method");
+	myInit();
+	glutDisplayFunc(myDisplay);
+	glutMainLoop();
+}
